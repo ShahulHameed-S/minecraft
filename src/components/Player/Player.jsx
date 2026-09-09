@@ -72,6 +72,13 @@ export default function Player() {
   const menuCameraPos = useRef(new THREE.Vector3(0.5, 2.5, 7.6));
   const menuCameraTarget = useRef(new THREE.Vector3(0.2, 1.8, 0.5));
 
+  // Camera orbit & look controls
+  const cameraYaw = useRef(0);
+  const cameraPitch = useRef(0.38);
+  const cameraDistance = useRef(8.0);
+  const isDragging = useRef(false);
+  const previousMousePos = useRef({ x: 0, y: 0 });
+
   // Area teleportation
   useEffect(() => {
     if (phase === 'menu') {
@@ -82,16 +89,16 @@ export default function Player() {
     if (phase === 'playing') {
       const areaObj = Object.values(AREAS).find((a) => a.id === currentArea);
       if (areaObj) {
+        cameraYaw.current = 0;
+        cameraPitch.current = 0.38;
         if (currentArea === 'spawn') {
           targetPosition.current.set(0, 0, 2);
-          camera.position.set(0, 4.5, 7.5);
         } else {
           targetPosition.current.set(areaObj.position[0], areaObj.position[1], areaObj.position[2] + 4);
-          camera.position.set(areaObj.position[0], areaObj.position[1] + 4.5, areaObj.position[2] + 11);
         }
       }
     }
-  }, [currentArea, phase, camera]);
+  }, [currentArea, phase]);
 
   // Keyboard controls (playing only)
   useEffect(() => {
@@ -111,6 +118,54 @@ export default function Player() {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+    };
+  }, [phase]);
+
+  // Mouse Drag / Touch Look & Zoom controls
+  useEffect(() => {
+    if (phase !== 'playing') return;
+
+    const onPointerDown = (e) => {
+      // Ignore clicks on UI buttons, inputs, modals, hotbar
+      if (e.target.closest('button, a, input, textarea, .inv-slot, .panel-rpg, .hud-panel, .tooltip-rpg')) {
+        return;
+      }
+      isDragging.current = true;
+      previousMousePos.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const onPointerMove = (e) => {
+      if (!isDragging.current) return;
+      const deltaX = e.clientX - previousMousePos.current.x;
+      const deltaY = e.clientY - previousMousePos.current.y;
+      previousMousePos.current = { x: e.clientX, y: e.clientY };
+
+      const sensitivity = 0.005;
+      cameraYaw.current -= deltaX * sensitivity;
+      cameraPitch.current = Math.max(0.08, Math.min(1.35, cameraPitch.current + deltaY * sensitivity));
+    };
+
+    const onPointerUp = () => {
+      isDragging.current = false;
+    };
+
+    const onWheel = (e) => {
+      if (e.target.closest('.panel-rpg, .book-page, .scrollable')) return;
+      cameraDistance.current = Math.max(3.5, Math.min(15.0, cameraDistance.current + e.deltaY * 0.005));
+    };
+
+    window.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+    window.addEventListener('wheel', onWheel, { passive: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+      window.removeEventListener('wheel', onWheel);
     };
   }, [phase]);
 
@@ -153,28 +208,47 @@ export default function Player() {
 
     // ── PLAYING MODE ────────────────────────────
     const speed = 8;
-    const moveDir = new THREE.Vector3();
+    const sinYaw = Math.sin(cameraYaw.current);
+    const cosYaw = Math.cos(cameraYaw.current);
 
-    if (keys.current.w) moveDir.z -= 1;
-    if (keys.current.s) moveDir.z += 1;
-    if (keys.current.a) moveDir.x -= 1;
-    if (keys.current.d) moveDir.x += 1;
+    // Forward and Right vectors relative to camera orientation
+    const forwardX = -sinYaw;
+    const forwardZ = -cosYaw;
+    const rightX = cosYaw;
+    const rightZ = -sinYaw;
 
-    const isMoving = moveDir.length() > 0;
+    const worldMoveDir = new THREE.Vector3();
+    if (keys.current.w) {
+      worldMoveDir.x += forwardX;
+      worldMoveDir.z += forwardZ;
+    }
+    if (keys.current.s) {
+      worldMoveDir.x -= forwardX;
+      worldMoveDir.z -= forwardZ;
+    }
+    if (keys.current.a) {
+      worldMoveDir.x -= rightX;
+      worldMoveDir.z -= rightZ;
+    }
+    if (keys.current.d) {
+      worldMoveDir.x += rightX;
+      worldMoveDir.z += rightZ;
+    }
+
+    const isMoving = worldMoveDir.lengthSq() > 0;
     if (isMoving) {
-      moveDir.normalize().multiplyScalar(speed * delta);
-      targetPosition.current.add(moveDir);
+      worldMoveDir.normalize().multiplyScalar(speed * delta);
+      targetPosition.current.add(worldMoveDir);
       walkCycle.current += delta * 8;
+
+      // Rotate player character mesh smoothly towards movement direction
+      const targetAngle = Math.atan2(worldMoveDir.x, worldMoveDir.z);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetAngle, 0.18);
     } else {
       walkCycle.current *= 0.9;
     }
 
-    groupRef.current.position.lerp(targetPosition.current, 0.1);
-
-    if (isMoving) {
-      const angle = Math.atan2(moveDir.x, moveDir.z);
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, angle, 0.15);
-    }
+    groupRef.current.position.lerp(targetPosition.current, 0.12);
 
     if (bodyRef.current) {
       bodyRef.current.position.y = 1.2 + Math.sin(walkCycle.current) * (isMoving ? 0.08 : 0.02);
@@ -188,13 +262,25 @@ export default function Player() {
     if (parts[4]) parts[4].rotation.x = -swing;
     if (parts[5]) parts[5].rotation.x = swing;
 
-    // Follow camera
-    const cameraOffset = new THREE.Vector3(0, 5, 8);
-    const cameraTarget = groupRef.current.position.clone().add(cameraOffset);
-    camera.position.lerp(cameraTarget, 0.06);
+    // Follow camera: spherical orbit around player with mouse look yaw and pitch
+    const dist = cameraDistance.current;
+    const pitch = cameraPitch.current;
+    const yaw = cameraYaw.current;
+
+    const camOffsetX = dist * Math.sin(yaw) * Math.cos(pitch);
+    const camOffsetY = dist * Math.sin(pitch);
+    const camOffsetZ = dist * Math.cos(yaw) * Math.cos(pitch);
+
+    const targetCamPos = new THREE.Vector3(
+      groupRef.current.position.x + camOffsetX,
+      groupRef.current.position.y + 1.8 + camOffsetY,
+      groupRef.current.position.z + camOffsetZ
+    );
+
+    camera.position.lerp(targetCamPos, 0.12);
     camera.lookAt(
       groupRef.current.position.x,
-      groupRef.current.position.y + 1.8,
+      groupRef.current.position.y + 1.6,
       groupRef.current.position.z
     );
   });

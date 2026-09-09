@@ -21,10 +21,7 @@ export default function MainMenu() {
   const menuContainerRef = useRef(null);
   const buttonsRef = useRef([]);
 
-  const displayName =
-    portfolio.name && !portfolio.name.includes('[')
-      ? `${portfolio.name.toUpperCase()} BUILDS`
-      : 'SANJAI BUILDS';
+  const displayName = 'SHAHUL BUILDS';
 
   useEffect(() => {
     if (phase !== 'menu' || !menuContainerRef.current) return;

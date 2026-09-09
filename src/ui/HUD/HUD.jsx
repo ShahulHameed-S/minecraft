@@ -163,10 +163,16 @@ export default function HUD() {
           <p className="hud-text" style={{ fontSize: '0.42rem', color: '#aaaaaa', textShadow: '1px 1px 0 #000' }}>
             WASD &mdash; Move
           </p>
+          <p className="hud-text" style={{ fontSize: '0.42rem', color: '#55ff55', textShadow: '1px 1px 0 #000' }}>
+            Mouse Drag &mdash; Orbit Camera
+          </p>
+          <p className="hud-text" style={{ fontSize: '0.42rem', color: '#aaaaaa', textShadow: '1px 1px 0 #000' }}>
+            Wheel &mdash; Zoom
+          </p>
           <p className="hud-text" style={{ fontSize: '0.42rem', color: '#aaaaaa', textShadow: '1px 1px 0 #000' }}>
             1-9 &mdash; Hotbar
           </p>
-          <p className="hud-text" style={{ fontSize: '0.42rem', color: '#aaaaaa', textShadow: '1px 1px 0 #000' }}>
+          <p className="hud-text" style={{ fontSize: '0.42rem', color: '#ffd700', textShadow: '1px 1px 0 #000' }}>
             [E] &mdash; Interact
           </p>
           <p className="hud-text" style={{ fontSize: '0.42rem', color: '#aaaaaa', textShadow: '1px 1px 0 #000' }}>

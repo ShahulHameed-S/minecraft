@@ -8,10 +8,10 @@
 
 const portfolio = {
   // ─── Identity ───────────────────────────────────────
-  name: "[YOUR NAME]",
-  role: "[YOUR ROLE]",
+  name: "Shahul",
+  role: "Creative Developer & Engineer",
   tagline: "Developer • Creative Technologist • Problem Solver",
-  location: "[YOUR LOCATION]",
+  location: "India",
   
   bio: "[Write a short bio about yourself. What drives you? What do you love building? What makes you unique as a developer?]",
   
@@ -140,7 +140,7 @@ const portfolio = {
 
   // ─── Site Meta ──────────────────────────────────────
   meta: {
-    title: "[YOUR NAME] — Developer Portfolio",
+    title: "Shahul Builds — Developer Portfolio",
     description: "An immersive, Minecraft-inspired developer portfolio showcasing projects, skills, and experience.",
     ogImage: "",
     favicon: "/favicon.ico",
