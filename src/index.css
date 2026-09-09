@@ -1,0 +1,426 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════
+   VOXEL GAME PORTFOLIO — GLOBAL STYLES
+   Designed to look like an actual game, not a website
+   ═══════════════════════════════════════════════════════ */
+
+@theme {
+  --color-charcoal: #1a1a2e;
+  --color-dark-charcoal: #0f0f1a;
+  --color-stone: #3d3d56;
+  --color-stone-light: #5a5a7a;
+  --color-warm-brown: #8b6914;
+  --color-deep-green: #2d5a27;
+  --color-forest-green: #3a7d32;
+  --color-muted-cyan: #4ecdc4;
+  --color-magic-purple: #9b59b6;
+  --color-magic-blue: #6c5ce7;
+  --color-lantern-gold: #f39c12;
+  --color-lantern-warm: #e67e22;
+  --color-enchant-purple: #7b2fff;
+  --color-enchant-blue: #00d4ff;
+  --color-end-void: #0a0014;
+  --color-panel-bg: rgba(15, 15, 26, 0.85);
+  --color-panel-border: rgba(100, 100, 140, 0.3);
+  --color-text-primary: #e8e8f0;
+  --color-text-secondary: #9a9ab0;
+  --color-text-muted: #6a6a80;
+
+  --font-display: 'Press Start 2P', monospace;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+/* ─── Dirt Background for Loading ─────────────────── */
+.dirt-bg {
+  background-color: #573d26;
+  background-image: 
+    linear-gradient(45deg, #442e1b 25%, transparent 25%),
+    linear-gradient(-45deg, #442e1b 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #442e1b 75%),
+    linear-gradient(-45deg, transparent 75%, #442e1b 75%);
+  background-size: 32px 32px;
+  background-position: 0 0, 0 16px, 16px -16px, -16px 0px;
+  image-rendering: pixelated;
+}
+
+/* ─── Base ─────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0f0f1a;
+  color: #e8e8f0;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 15, 26, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 140, 0.4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 100, 140, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════
+   GAME UI STYLES — Voxel Game Aesthetic
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Game Panel (dark stone menu) ─────────────────── */
+.game-panel {
+  background: linear-gradient(180deg, #3a3a3a 0%, #2c2c2c 100%);
+  border: 3px solid #1a1a1a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    inset 1px 0 0 rgba(255, 255, 255, 0.05),
+    inset -1px 0 0 rgba(0, 0, 0, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.6);
+  border-radius: 0;
+  image-rendering: pixelated;
+}
+
+/* ─── Game Button (Authentic Minecraft Stone Button) ─ */
+.btn-game {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #7b7b7b 0%, #686868 49%, #555555 50%, #4c4c4c 100%);
+  border: 2px solid #000;
+  color: #e4e4e4;
+  cursor: pointer;
+  position: relative;
+  letter-spacing: 0.5px;
+  transition: background 0.05s ease;
+  border-radius: 0;
+  text-shadow: 2px 2px 0 #1a1a1a;
+  box-shadow:
+    inset 2px 2px 0 #9c9c9c,
+    inset -2px -2px 0 #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.btn-game:hover {
+  background: linear-gradient(180deg, #8787c8 0%, #6c6cb0 49%, #58589c 50%, #4e4e8c 100%);
+  color: #ffffa0;
+  text-shadow: 2px 2px 0 #111130;
+  box-shadow:
+    inset 2px 2px 0 #ababdf,
+    inset -2px -2px 0 #222250;
+}
+
+.btn-game:active {
+  background: linear-gradient(180deg, #444444 0%, #3a3a3a 100%);
+  box-shadow:
+    inset 2px 2px 0 #1a1a1a,
+    inset -2px -2px 0 #666666;
+  color: #cccccc;
+}
+
+.btn-game:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ─── Inventory Slot (Authentic Minecraft Hotbar) ──── */
+.inv-slot {
+  width: 44px;
+  height: 44px;
+  background: #8b8b8b;
+  border: 2px solid #373737;
+  box-shadow:
+    inset 2px 2px 0 #373737,
+    inset -2px -2px 0 #ffffff;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  image-rendering: pixelated;
+  transition: transform 0.05s ease;
+}
+
+.inv-slot:hover {
+  background: #9c9c9c;
+}
+
+.inv-slot.active {
+  background: #8b8b8b;
+  border: 2px solid #ffffff;
+  box-shadow:
+    0 0 0 2px #000000,
+    inset 2px 2px 0 #ffffff,
+    inset -2px -2px 0 #555555;
+  z-index: 10;
+  transform: scale(1.05);
+}
+
+/* ─── Hotbar Container ─────────────────────────────── */
+.hotbar-container {
+  background: #1e1e1e;
+  border: 2px solid #000000;
+  padding: 3px;
+  display: flex;
+  gap: 3px;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.15),
+    0 6px 24px rgba(0, 0, 0, 0.7);
+  border-radius: 0;
+}
+
+/* ─── Pixel Heart ──────────────────────────────────── */
+.pixel-heart {
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  position: relative;
+}
+
+.pixel-heart::before {
+  content: '❤';
+  font-size: 10px;
+  line-height: 1;
+  color: #cc2222;
+  text-shadow: 0.5px 0.5px 0 #660000;
+  image-rendering: pixelated;
+}
+
+.pixel-heart.empty::before {
+  color: #3a3a3a;
+  text-shadow: 0.5px 0.5px 0 #1a1a1a;
+}
+
+.pixel-heart.half::before {
+  color: #cc2222;
+  opacity: 0.5;
+}
+
+/* ─── XP Bar (Game Style) ──────────────────────────── */
+.xp-bar-container {
+  background: #1a1a1a;
+  border: 1px solid #000;
+  height: 5px;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(180deg, #80ff20 0%, #44cc00 100%);
+  border-radius: 0;
+  transition: width 0.8s ease;
+}
+
+/* ─── Legacy Panel Glass (for panels) ──────────────── */
+.panel-glass {
+  background: rgba(15, 15, 26, 0.88);
+  border: 1px solid rgba(100, 100, 140, 0.25);
+  backdrop-filter: blur(12px);
+  border-radius: 4px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ─── Pixel Border (for RPG feel) ──────────────────── */
+.pixel-border {
+  border: 2px solid rgba(100, 100, 140, 0.4);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.06),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── RPG Button (kept for panels) ─────────────────── */
+.btn-rpg {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  padding: 12px 24px;
+  background: linear-gradient(180deg, #3d3d56 0%, #2a2a3e 100%);
+  border: 2px solid rgba(100, 100, 140, 0.5);
+  color: #e8e8f0;
+  cursor: pointer;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.15s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-rpg:hover {
+  background: linear-gradient(180deg, #4a4a66 0%, #353550 100%);
+  border-color: rgba(78, 205, 196, 0.5);
+  color: #4ecdc4;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(78, 205, 196, 0.15);
+}
+
+.btn-rpg:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-rpg:focus-visible {
+  outline: 2px solid #4ecdc4;
+  outline-offset: 2px;
+}
+
+/* ─── Glow Text ────────────────────────────────────── */
+.text-glow-cyan {
+  text-shadow: 0 0 10px rgba(78, 205, 196, 0.5), 0 0 30px rgba(78, 205, 196, 0.2);
+}
+
+.text-glow-purple {
+  text-shadow: 0 0 10px rgba(123, 47, 255, 0.5), 0 0 30px rgba(123, 47, 255, 0.2);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 10px rgba(243, 156, 18, 0.5), 0 0 30px rgba(243, 156, 18, 0.2);
+}
+
+/* ─── Tooltip (game style) ─────────────────────────── */
+.tooltip-rpg {
+  background: #1a0a30;
+  border: 2px solid #2a1a50;
+  padding: 6px 10px;
+  font-size: 0.7rem;
+  border-radius: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  z-index: 100;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* ─── Progress Bar ─────────────────────────────────── */
+.progress-bar-container {
+  background: rgba(15, 15, 26, 0.6);
+  border: 1px solid rgba(100, 100, 140, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  height: 12px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+}
+
+/* ─── Game HUD Text ────────────────────────────────── */
+.hud-text {
+  font-family: 'Press Start 2P', monospace;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8), 2px 2px 0 rgba(0, 0, 0, 0.4);
+  image-rendering: pixelated;
+}
+
+/* ─── Loading Screen Dirt Pattern ──────────────────── */
+.dirt-bg {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 32px,
+      rgba(0,0,0,0.05) 32px,
+      rgba(0,0,0,0.05) 64px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 32px,
+      rgba(0,0,0,0.05) 32px,
+      rgba(0,0,0,0.05) 64px
+    ),
+    linear-gradient(180deg, #6b4423 0%, #5a3a1a 30%, #4a2e14 60%, #3d2410 100%);
+}
+
+/* ─── Animations ───────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ─── Reduced Motion ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Canvas ───────────────────────────────────────── */
+canvas {
+  display: block;
+  outline: none;
+}
