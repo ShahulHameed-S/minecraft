@@ -1,84 +1,93 @@
 import VoxelLantern from '../../components/Common/VoxelLantern';
 import Particles from '../../components/Environment/Particles';
 
-/** Area 05 — Advancements Hall: experience/education/achievements */
+/** Sculk Block with glowing cyan tendrils */
+function SculkBlock({ position = [0, 0, 0], scale = [1, 1, 1] }) {
+  return (
+    <group position={position}>
+      <mesh castShadow receiveShadow>
+        <boxGeometry args={scale} />
+        <meshStandardMaterial color="#05181b" roughness={0.9} />
+      </mesh>
+      {/* Cyan glowing veins */}
+      <mesh position={[0, scale[1] / 2 + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[scale[0] * 0.8, scale[2] * 0.8]} />
+        <meshStandardMaterial
+          color="#00e5ff"
+          emissive="#00b4cc"
+          emissiveIntensity={0.8}
+          roughness={0.4}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+/** Area 05 — Advancements & Deep Dark Ruins: matches /reference/achievements.png */
 export default function AdvancementsScene() {
   return (
     <group position={[160, 0, 0]}>
-      {/* Floor — polished stone */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#2a2a3e" roughness={0.9} />
+      {/* Deep Dark Floor */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+        <planeGeometry args={[30, 26]} />
+        <meshStandardMaterial color="#0a1215" roughness={0.95} />
       </mesh>
 
-      {/* Walls */}
-      <mesh position={[0, 4, -10]} castShadow>
-        <boxGeometry args={[20, 8, 0.5]} />
-        <meshStandardMaterial color="#3d3d56" roughness={0.95} />
+      {/* Deepslate Stone Walls & Ancient City Archway */}
+      <mesh position={[0, 6, -11]} castShadow>
+        <boxGeometry args={[30, 12, 1.2]} />
+        <meshStandardMaterial color="#1a2024" roughness={0.9} />
       </mesh>
-      <mesh position={[-10, 4, 0]} castShadow>
-        <boxGeometry args={[0.5, 8, 20]} />
-        <meshStandardMaterial color="#3d3d56" roughness={0.95} />
+      <mesh position={[-15, 6, 0]} castShadow>
+        <boxGeometry args={[1.2, 12, 26]} />
+        <meshStandardMaterial color="#161b1e" roughness={0.9} />
       </mesh>
-      <mesh position={[10, 4, 0]} castShadow>
-        <boxGeometry args={[0.5, 8, 20]} />
-        <meshStandardMaterial color="#3d3d56" roughness={0.95} />
-      </mesh>
-
-      {/* Ceiling */}
-      <mesh position={[0, 8, 0]}>
-        <boxGeometry args={[20, 0.3, 20]} />
-        <meshStandardMaterial color="#2a2a3e" roughness={0.95} />
+      <mesh position={[15, 6, 0]} castShadow>
+        <boxGeometry args={[1.2, 12, 26]} />
+        <meshStandardMaterial color="#161b1e" roughness={0.9} />
       </mesh>
 
-      {/* ── Trophy pedestals ──────────────────────── */}
-      {[[-5, -6], [0, -6], [5, -6], [-5, -2], [0, -2], [5, -2]].map(([x, z], i) => (
-        <group key={`trophy-${i}`} position={[x, 0, z]}>
-          {/* Pedestal */}
-          <mesh position={[0, 0.5, 0]} castShadow>
-            <boxGeometry args={[1.2, 1, 1.2]} />
-            <meshStandardMaterial color="#4a4a6a" roughness={0.85} />
+      {/* ── Ancient Ruins Pillars ───────────────────── */}
+      {[[-6, -6], [6, -6], [-8, 2], [8, 2], [-4, 6], [4, 6]].map(([x, z], i) => (
+        <group key={`ruin-${i}`} position={[x, 0, z]}>
+          <mesh position={[0, 3.5, 0]} castShadow>
+            <boxGeometry args={[1.4, 7, 1.4]} />
+            <meshStandardMaterial color="#1f262b" roughness={0.95} />
           </mesh>
-          {/* Trophy item */}
-          <mesh position={[0, 1.3, 0]} castShadow>
-            <octahedronGeometry args={[0.25]} />
-            <meshStandardMaterial 
-              color={['#4ecdc4', '#f39c12', '#9b59b6', '#e74c3c', '#3498db', '#2ecc71'][i]} 
-              emissive={['#4ecdc4', '#f39c12', '#9b59b6', '#e74c3c', '#3498db', '#2ecc71'][i]}
-              emissiveIntensity={0.3}
-              roughness={0.4}
-              metalness={0.3}
-            />
+          <mesh position={[0, 7.2, 0]} castShadow>
+            <boxGeometry args={[1.8, 0.6, 1.8]} />
+            <meshStandardMaterial color="#273037" roughness={0.95} />
           </mesh>
-          {/* Glow */}
-          <pointLight 
-            position={[0, 1.5, 0]} 
-            color={['#4ecdc4', '#f39c12', '#9b59b6', '#e74c3c', '#3498db', '#2ecc71'][i]} 
-            intensity={0.5} 
-            distance={4} 
-            decay={2} 
-          />
         </group>
       ))}
 
-      {/* ── Wall frames (achievement displays) ────── */}
-      {[-6, -3, 0, 3, 6].map((x, i) => (
-        <mesh key={`frame-${i}`} position={[x, 4, -9.7]} castShadow>
-          <boxGeometry args={[1.5, 1.5, 0.1]} />
-          <meshStandardMaterial color="#5a5a7a" roughness={0.85} />
+      {/* ── Terraced Sculk Catalyst Beds ───────────── */}
+      <SculkBlock position={[-5, 0.4, -4]} scale={[6, 0.8, 4]} />
+      <SculkBlock position={[5, 0.4, -4]} scale={[6, 0.8, 4]} />
+      <SculkBlock position={[-3, 1.0, -7]} scale={[5, 0.6, 3]} />
+      <SculkBlock position={[3, 1.0, -7]} scale={[5, 0.6, 3]} />
+
+      {/* ── Stone Steps leading up ─────────────────── */}
+      {[0, 1, 2, 3].map((step) => (
+        <mesh key={`step-${step}`} position={[0, step * 0.35 + 0.18, -2 - step * 0.8]} receiveShadow>
+          <boxGeometry args={[4, 0.35, 0.8]} />
+          <meshStandardMaterial color="#2c353c" roughness={0.9} />
         </mesh>
       ))}
 
-      {/* ── Lanterns ──────────────────────────────── */}
-      <VoxelLantern position={[-7, 0, -4]} color="#4ecdc4" />
-      <VoxelLantern position={[7, 0, -4]} color="#4ecdc4" />
-      <VoxelLantern position={[-7, 0, 3]} color="#f39c12" />
-      <VoxelLantern position={[7, 0, 3]} color="#f39c12" />
+      {/* ── Soul Lanterns (Cyan glowing lights) ────── */}
+      <VoxelLantern position={[-3, 0.8, -3]} color="#00e5ff" />
+      <VoxelLantern position={[3, 0.8, -3]} color="#00e5ff" />
+      <VoxelLantern position={[-6, 0, 4]} color="#00e5ff" />
+      <VoxelLantern position={[6, 0, 4]} color="#00e5ff" />
 
-      {/* Ambient */}
-      <pointLight position={[0, 6, -3]} color="#4ecdc4" intensity={1} distance={15} decay={2} />
+      {/* ── Atmospheric Cyan Soul Lights ───────────── */}
+      <pointLight position={[0, 5, -5]} color="#00e5ff" intensity={2.2} distance={18} decay={2} />
+      <pointLight position={[-6, 2, 0]} color="#00ffff" intensity={1.5} distance={10} decay={2} />
+      <pointLight position={[6, 2, 0]} color="#00ffff" intensity={1.5} distance={10} decay={2} />
 
-      <Particles count={20} area={12} color="#4ecdc4" speed={0.1} />
+      {/* ── Cyan Sculk Soul Particles ──────────────── */}
+      <Particles count={45} area={20} color="#00e5ff" speed={0.12} />
     </group>
   );
 }

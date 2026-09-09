@@ -6,6 +6,11 @@ import portfolio from './data/portfolio';
 
 // 3D Scenes
 import SpawnVillage from './scenes/SpawnVillage/SpawnVillage';
+import Workshop from './scenes/Workshop/Workshop';
+import EnchantmentRoom from './scenes/EnchantmentRoom/EnchantmentRoom';
+import TradingHall from './scenes/TradingHall/TradingHall';
+import AdvancementsScene from './scenes/Advancements/AdvancementsScene';
+import TheEnd from './scenes/TheEnd/TheEnd';
 import VoxelSky from './components/Environment/VoxelSky';
 
 // Player
@@ -60,8 +65,13 @@ function World() {
       {/* Sky */}
       <VoxelSky />
 
-      {/* Only spawn village for first milestone */}
+      {/* All 3D World Scenes */}
       <SpawnVillage />
+      <Workshop />
+      <EnchantmentRoom />
+      <TradingHall />
+      <AdvancementsScene />
+      <TheEnd />
 
       {/* Player + Camera */}
       <Player />
@@ -103,7 +113,7 @@ function GameScene() {
 
 /** Global keyboard handlers */
 function GlobalKeyboard() {
-  const { phase, activePanel, activeModal, setPanel, closeModal, toggleMenu } = useGame();
+  const { phase, activePanel, activeModal, currentArea, setPanel, closeModal, toggleMenu } = useGame();
 
   useEffect(() => {
     const onKeyDown = (e) => {
@@ -115,11 +125,23 @@ function GlobalKeyboard() {
         } else if (phase === 'playing') {
           toggleMenu();
         }
+      } else if ((e.key === 'e' || e.key === 'E') && phase === 'playing' && !activeModal) {
+        // [E] Interact: toggle panel for current area
+        const panelMap = {
+          spawn: 'about',
+          workshop: 'about',
+          enchantment: 'skills',
+          trading: 'projects',
+          advancements: 'experience',
+          theEnd: 'contact',
+        };
+        const target = panelMap[currentArea] || 'about';
+        setPanel(activePanel === target ? null : target);
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [phase, activePanel, activeModal, setPanel, closeModal, toggleMenu]);
+  }, [phase, activePanel, activeModal, currentArea, setPanel, closeModal, toggleMenu]);
 
   return null;
 }

@@ -1,28 +1,27 @@
-import { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useGame } from '../../context/GameContext';
 import portfolio from '../../data/portfolio';
 import gsap from 'gsap';
 
-/** Projects panel — Trading Hall style */
+/**
+ * Projects Panel — Matches /reference/trading-hall.png and /reference/Screenshot_2026_0909_111507.png:
+ * - Tab 1: "Villager Trades" (Emeralds -> Projects, In stock, Stats: 20+ Builds, 18+ Clients, 3 Countries, Make an Offer)
+ * - Tab 2: "Chest - Completed Builds" (Inventory slot grid with rare item badges)
+ */
 export default function ProjectsPanel() {
-  const { activePanel, setPanel, setModal } = useGame();
+  const { activePanel, setPanel, setModal, setArea } = useGame();
+  const [viewMode, setViewMode] = useState('trades'); // 'trades' | 'chest'
+  const [hoveredProject, setHoveredProject] = useState(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const panelRef = useRef(null);
-  const cardsRef = useRef([]);
 
   useEffect(() => {
     if (activePanel === 'projects' && panelRef.current) {
-      gsap.fromTo(panelRef.current,
+      gsap.fromTo(
+        panelRef.current,
         { opacity: 0, x: -30, scale: 0.95 },
-        { opacity: 1, x: 0, scale: 1, duration: 0.4, ease: 'back.out(1.4)' }
+        { opacity: 1, x: 0, scale: 1, duration: 0.35, ease: 'back.out(1.2)' }
       );
-      cardsRef.current.forEach((card, i) => {
-        if (card) {
-          gsap.fromTo(card,
-            { opacity: 0, y: 15 },
-            { opacity: 1, y: 0, duration: 0.4, delay: 0.15 + i * 0.1, ease: 'power2.out' }
-          );
-        }
-      });
     }
   }, [activePanel]);
 
@@ -32,101 +31,227 @@ export default function ProjectsPanel() {
     setModal({ type: 'project', data: project });
   };
 
+  const handleMakeOffer = () => {
+    setArea('theEnd');
+    setPanel('contact');
+  };
+
   return (
-    <div className="fixed inset-0 z-25 flex items-center justify-start p-6 md:p-12 pointer-events-none">
+    <div
+      onMouseMove={(e) => setMousePos({ x: e.clientX, y: e.clientY })}
+      className="fixed inset-0 z-40 flex items-center justify-start p-6 md:p-14 pointer-events-none select-none"
+    >
       <div
         ref={panelRef}
-        className="panel-glass p-6 md:p-8 max-w-xl w-full pointer-events-auto overflow-y-auto max-h-[80vh]"
+        className="game-panel p-6 max-w-xl w-full pointer-events-auto shadow-2xl relative"
+        style={{
+          background: 'linear-gradient(180deg, #2b2b2b 0%, #1c1c1c 100%)',
+          border: '3px solid #000000',
+          boxShadow: 'inset 2px 2px 0 #555555, inset -2px -2px 0 #111111, 0 12px 36px rgba(0,0,0,0.8)',
+        }}
         role="dialog"
-        aria-label="Projects"
+        aria-label="Projects and Builds"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2
-            className="text-lantern-gold text-glow-gold"
-            style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.75rem' }}
-          >
-            📦 VILLAGER TRADES
-          </h2>
-          <button
-            onClick={() => setPanel(null)}
-            className="text-text-muted hover:text-text-primary transition-colors cursor-pointer text-xl leading-none"
-            aria-label="Close panel"
-          >
-            ✕
-          </button>
+        {/* Header & Tabs */}
+        <div className="flex items-center justify-between pb-3 border-b-2 border-[#111111] mb-4">
+          <div className="flex items-center gap-3">
+            <h2
+              className="hud-text text-white"
+              style={{ fontSize: '0.85rem', letterSpacing: '1px', textShadow: '2px 2px 0 #000' }}
+            >
+              {viewMode === 'trades' ? 'Villager Trades' : 'Chest - Completed Builds'}
+            </h2>
+            <span
+              className="hud-text text-stone-400 hidden sm:inline"
+              style={{ fontSize: '0.42rem' }}
+            >
+              Master Builder &bull; Level 5
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setViewMode(viewMode === 'trades' ? 'chest' : 'trades')}
+              className="btn-game px-2.5 py-1 text-[9px]"
+              aria-label="Toggle View"
+            >
+              {viewMode === 'trades' ? '📦 Chest View' : '💎 Trades View'}
+            </button>
+            <button
+              onClick={() => setPanel(null)}
+              className="btn-game px-2.5 py-1 text-xs leading-none"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
-        <div className="h-px bg-gradient-to-r from-lantern-gold/30 via-lantern-gold/10 to-transparent mb-6" />
+        {/* ── VIEW 1: VILLAGER TRADES (matches /reference/trading-hall.png) ── */}
+        {viewMode === 'trades' && (
+          <div>
+            <div className="space-y-2 mb-5">
+              {portfolio.projects.map((project, i) => {
+                const costs = [12, 28, 20, 36];
+                const cost = costs[i % costs.length];
+                const inStock = i < 3;
 
-        {/* Project cards */}
-        <div className="space-y-4">
-          {portfolio.projects.map((project, i) => (
-            <div
-              key={project.id}
-              ref={el => cardsRef.current[i] = el}
-              className="border border-stone/30 bg-dark-charcoal/40 p-4 hover:border-lantern-gold/40 hover:bg-lantern-gold/5 transition-all duration-200 cursor-pointer group"
-              style={{ borderRadius: '3px' }}
-              onClick={() => handleOpenProject(project)}
-              role="button"
-              tabIndex={0}
-              aria-label={`View project: ${project.title}`}
-              onKeyDown={(e) => e.key === 'Enter' && handleOpenProject(project)}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  {/* Project icon */}
-                  <div className="w-8 h-8 flex items-center justify-center border border-lantern-gold/30 bg-lantern-gold/10"
-                    style={{ borderRadius: '2px' }}>
-                    <span className="text-sm">
-                      {project.category === 'fullstack' ? '🌐' : project.category === '3d' ? '🎮' : '🔧'}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-text-primary text-sm font-semibold group-hover:text-lantern-gold transition-colors">
-                      {project.title}
-                    </h3>
-                    <p className="text-text-muted text-xs">{project.type}</p>
-                  </div>
-                </div>
-                {project.featured && (
-                  <span className="text-lantern-gold" style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.3rem' }}>
-                    ★ FEATURED
-                  </span>
-                )}
-              </div>
-
-              <p className="text-text-secondary text-xs leading-relaxed mb-3">
-                {project.description}
-              </p>
-
-              {/* Stack tags */}
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {project.stack.map(tech => (
-                  <span
-                    key={tech}
-                    className="px-2 py-0.5 text-xs border border-stone/30 text-text-muted bg-stone/10"
-                    style={{ borderRadius: '2px', fontSize: '0.65rem' }}
+                return (
+                  <div
+                    key={project.id}
+                    onClick={() => handleOpenProject(project)}
+                    onMouseEnter={() => setHoveredProject(project)}
+                    onMouseLeave={() => setHoveredProject(null)}
+                    className="flex items-center justify-between px-3 py-2.5 border border-[#333333] hover:border-[#80ff20] hover:bg-white/5 transition-all cursor-pointer"
+                    style={{ background: '#191919' }}
                   >
-                    {tech}
-                  </span>
-                ))}
-              </div>
+                    {/* Emerald cost */}
+                    <div className="flex items-center gap-2 w-16 shrink-0">
+                      <span className="text-sm">💎</span>
+                      <span
+                        className="hud-text text-white font-bold"
+                        style={{ fontSize: '0.62rem', textShadow: '1px 1px 0 #000' }}
+                      >
+                        {cost}
+                      </span>
+                    </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-text-muted text-xs">
-                  {project.status} {project.year ? `• ${project.year}` : ''}
-                </span>
-                <span
-                  className="text-lantern-gold group-hover:translate-x-1 transition-transform"
-                  style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.4rem' }}
-                >
-                  VIEW →
-                </span>
+                    {/* Arrow */}
+                    <span className="text-stone-500 text-xs px-1">➔</span>
+
+                    {/* Project Title & Subtitle */}
+                    <div className="flex-1 px-2 min-w-0">
+                      <h4
+                        className="hud-text text-white truncate"
+                        style={{ fontSize: '0.52rem', textShadow: '1px 1px 0 #000' }}
+                      >
+                        {project.title}
+                      </h4>
+                      <p
+                        className="text-stone-400 text-xs truncate mt-0.5"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {project.type} &bull; {project.stack.slice(0, 3).join(', ')}
+                      </p>
+                    </div>
+
+                    {/* Stock Status Badge */}
+                    <div className="shrink-0 pl-2">
+                      <span
+                        className="hud-text px-2 py-0.5 text-[9px] border"
+                        style={{
+                          color: inStock ? '#55ff55' : '#f1c40f',
+                          borderColor: inStock ? '#2ecc71' : '#f39c12',
+                          background: inStock ? 'rgba(46,204,113,0.1)' : 'rgba(241,196,15,0.1)',
+                          textShadow: '1px 1px 0 #000',
+                        }}
+                      >
+                        {inStock ? 'In stock' : 'Limited'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom Stats Row (from reference image) */}
+            <div
+              className="flex items-center justify-around py-2.5 mb-4 border border-[#333333]"
+              style={{ background: '#141414' }}
+            >
+              <div className="text-center">
+                <p className="hud-text text-white text-xs font-bold" style={{ textShadow: '1px 1px 0 #000' }}>
+                  20+
+                </p>
+                <p className="hud-text text-stone-400 text-[8px] mt-0.5">BUILDS</p>
+              </div>
+              <div className="h-6 w-px bg-[#333333]" />
+              <div className="text-center">
+                <p className="hud-text text-white text-xs font-bold" style={{ textShadow: '1px 1px 0 #000' }}>
+                  18+
+                </p>
+                <p className="hud-text text-stone-400 text-[8px] mt-0.5">CLIENTS</p>
+              </div>
+              <div className="h-6 w-px bg-[#333333]" />
+              <div className="text-center">
+                <p className="hud-text text-white text-xs font-bold" style={{ textShadow: '1px 1px 0 #000' }}>
+                  3
+                </p>
+                <p className="hud-text text-stone-400 text-[8px] mt-0.5">COUNTRIES</p>
               </div>
             </div>
-          ))}
-        </div>
+
+            {/* Bottom button: Make an Offer */}
+            <button
+              onClick={handleMakeOffer}
+              className="btn-game w-full py-2.5 text-center"
+              style={{ fontSize: '0.62rem' }}
+            >
+              Make an Offer
+            </button>
+          </div>
+        )}
+
+        {/* ── VIEW 2: CHEST - COMPLETED BUILDS (matches /reference/Screenshot_...png) ── */}
+        {viewMode === 'chest' && (
+          <div>
+            <p className="hud-text text-stone-400 text-[9px] mb-3">
+              Hover an item to inspect completed build details:
+            </p>
+            <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 mb-5">
+              {portfolio.projects.map((project, i) => {
+                const icons = ['⭐', '🔭', '⚡', '🏹', '💎', '📦'];
+                const icon = icons[i % icons.length];
+
+                return (
+                  <button
+                    key={project.id}
+                    onClick={() => handleOpenProject(project)}
+                    onMouseEnter={() => setHoveredProject(project)}
+                    onMouseLeave={() => setHoveredProject(null)}
+                    className="inv-slot"
+                    style={{ width: '56px', height: '56px' }}
+                    aria-label={project.title}
+                  >
+                    <span className="text-2xl">{icon}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              onClick={() => setViewMode('trades')}
+              className="btn-game w-full py-2.5 text-center"
+              style={{ fontSize: '0.62rem' }}
+            >
+              See Trades
+            </button>
+          </div>
+        )}
+
+        {/* Floating Tooltip */}
+        {hoveredProject && (
+          <div
+            className="fixed z-50 pointer-events-none p-3 max-w-xs"
+            style={{
+              left: `${mousePos.x + 15}px`,
+              top: `${mousePos.y + 15}px`,
+              background: '#100010',
+              border: '2px solid #280050',
+              boxShadow: 'inset 0 0 6px #5000a0, 0 8px 24px rgba(0,0,0,0.8)',
+            }}
+          >
+            <p className="hud-text text-[#ffdf55] mb-1" style={{ fontSize: '0.55rem', textShadow: '1px 1px 0 #000' }}>
+              {hoveredProject.title}
+            </p>
+            <p className="hud-text text-[#a8f5ff] mb-1 leading-relaxed" style={{ fontSize: '0.42rem', textShadow: '1px 1px 0 #000' }}>
+              {hoveredProject.description}
+            </p>
+            <p className="hud-text text-[#b0a080]" style={{ fontSize: '0.38rem' }}>
+              Stack: {hoveredProject.stack.join(', ')}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

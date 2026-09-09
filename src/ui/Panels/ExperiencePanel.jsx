@@ -3,145 +3,174 @@ import { useGame } from '../../context/GameContext';
 import portfolio from '../../data/portfolio';
 import gsap from 'gsap';
 
-/** Experience panel — Advancements style */
+/**
+ * Advancements Panel — Matches /reference/achievements.png:
+ * - Dark stone game panel titled "Advancements"
+ * - List of achievements with square icon frame, title, description, and green checkmark
+ * - "Send a Message" button
+ */
 export default function ExperiencePanel() {
-  const { activePanel, setPanel } = useGame();
+  const { activePanel, setPanel, setArea } = useGame();
   const panelRef = useRef(null);
 
   useEffect(() => {
     if (activePanel === 'experience' && panelRef.current) {
-      gsap.fromTo(panelRef.current,
-        { opacity: 0, x: -30, scale: 0.95 },
-        { opacity: 1, x: 0, scale: 1, duration: 0.4, ease: 'back.out(1.4)' }
+      gsap.fromTo(
+        panelRef.current,
+        { opacity: 0, x: 30, scale: 0.95 },
+        { opacity: 1, x: 0, scale: 1, duration: 0.35, ease: 'back.out(1.2)' }
       );
     }
   }, [activePanel]);
 
   if (activePanel !== 'experience') return null;
 
+  const handleSendMessage = () => {
+    setArea('theEnd');
+    setPanel('contact');
+  };
+
+  // Combine portfolio achievements and experience
+  const defaultAdvancements = [
+    {
+      icon: '📦',
+      title: 'Taking Inventory',
+      desc: 'Shipped my first live web build',
+      unlocked: true,
+    },
+    {
+      icon: '🌍',
+      title: 'Into the Wider World',
+      desc: 'Delivered projects across multiple continents',
+      unlocked: true,
+    },
+    {
+      icon: '🔥',
+      title: 'Hot Topic',
+      desc: 'Built viral creative 3D web experiences',
+      unlocked: true,
+    },
+    {
+      icon: '⏳',
+      title: 'The Long Haul',
+      desc: '1000+ hours of consistent coding and craft',
+      unlocked: true,
+    },
+    {
+      icon: '🔮',
+      title: 'Free the End',
+      desc: 'Ready for full-time & creative collaborations',
+      unlocked: false,
+    },
+  ];
+
+  const advancements =
+    portfolio.achievements && portfolio.achievements.length > 0
+      ? portfolio.achievements.map((a, i) => ({
+          icon: a.icon || ['📦', '🌍', '🔥', '⏳', '🔮'][i % 5],
+          title: a.title,
+          desc: a.description,
+          unlocked: a.unlocked !== false,
+        }))
+      : defaultAdvancements;
+
   return (
-    <div className="fixed inset-0 z-25 flex items-center justify-start p-6 md:p-12 pointer-events-none">
+    <div className="fixed inset-0 z-40 flex items-center justify-end p-6 md:p-14 pointer-events-none select-none">
       <div
         ref={panelRef}
-        className="panel-glass p-6 md:p-8 max-w-lg w-full pointer-events-auto overflow-y-auto max-h-[80vh]"
+        className="game-panel p-6 max-w-md w-full pointer-events-auto shadow-2xl relative mr-2 md:mr-6"
+        style={{
+          background: 'linear-gradient(180deg, #2b2b2b 0%, #1c1c1c 100%)',
+          border: '3px solid #000000',
+          boxShadow: 'inset 2px 2px 0 #555555, inset -2px -2px 0 #111111, 0 12px 36px rgba(0,0,0,0.8)',
+        }}
         role="dialog"
-        aria-label="Experience and Achievements"
+        aria-label="Advancements"
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between pb-3 border-b-2 border-[#111111] mb-4">
           <h2
-            className="text-muted-cyan text-glow-cyan"
-            style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.75rem' }}
+            className="hud-text text-white"
+            style={{ fontSize: '0.85rem', letterSpacing: '1px', textShadow: '2px 2px 0 #000' }}
           >
-            🏆 ADVANCEMENTS
+            Advancements
           </h2>
           <button
             onClick={() => setPanel(null)}
-            className="text-text-muted hover:text-text-primary transition-colors cursor-pointer text-xl leading-none"
-            aria-label="Close panel"
+            className="btn-game px-2.5 py-1 text-xs leading-none"
+            aria-label="Close"
           >
             ✕
           </button>
         </div>
 
-        <div className="h-px bg-gradient-to-r from-muted-cyan/30 via-muted-cyan/10 to-transparent mb-6" />
-
-        {/* Achievements */}
-        <div className="mb-8">
-          <h3 className="text-text-muted mb-4" style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.45rem' }}>
-            ACHIEVEMENTS
-          </h3>
-          <div className="space-y-2.5">
-            {portfolio.achievements.map((ach, i) => (
+        {/* Advancements List (Matches Reference #3) */}
+        <div className="space-y-2.5 mb-5">
+          {advancements.map((item, i) => (
+            <div
+              key={item.title}
+              className={`flex items-center gap-3 p-2.5 border transition-all ${
+                item.unlocked
+                  ? 'border-[#383838] hover:border-[#80ff20] bg-[#191919]'
+                  : 'border-[#222222] bg-[#131313] opacity-60'
+              }`}
+            >
+              {/* Icon Frame */}
               <div
-                key={i}
-                className={`flex items-center gap-3 p-3 border transition-all ${
-                  ach.unlocked
-                    ? 'border-muted-cyan/20 bg-muted-cyan/5'
-                    : 'border-stone/20 bg-stone/5 opacity-50'
-                }`}
-                style={{ borderRadius: '3px' }}
+                className="w-10 h-10 shrink-0 flex items-center justify-center border border-[#444444]"
+                style={{
+                  background: item.unlocked ? '#242424' : '#141414',
+                  boxShadow: 'inset 1px 1px 0 #000',
+                }}
               >
-                <span className="text-lg">{ach.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className={`text-sm font-medium ${ach.unlocked ? 'text-text-primary' : 'text-text-muted'}`}>
-                      {ach.unlocked ? ach.title : '???'}
-                    </p>
-                    {ach.unlocked && (
-                      <span className="text-muted-cyan" style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.3rem' }}>
-                        ✓
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-text-muted text-xs">
-                    {ach.unlocked ? ach.description : 'Achievement locked'}
-                  </p>
-                </div>
-                {ach.date && (
-                  <span className="text-text-muted text-xs whitespace-nowrap">{ach.date}</span>
+                <span className="text-xl">{item.icon}</span>
+              </div>
+
+              {/* Title & Desc */}
+              <div className="flex-1 min-w-0">
+                <h4
+                  className="hud-text text-white truncate"
+                  style={{
+                    fontSize: '0.48rem',
+                    textShadow: '1px 1px 0 #000',
+                    color: item.unlocked ? '#ffffff' : '#888888',
+                  }}
+                >
+                  {item.title}
+                </h4>
+                <p
+                  className="text-stone-400 text-xs truncate mt-0.5"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {item.desc}
+                </p>
+              </div>
+
+              {/* Green Checkmark */}
+              <div className="shrink-0 px-2">
+                {item.unlocked ? (
+                  <span
+                    className="hud-text text-[#55ff55] font-bold text-sm"
+                    style={{ textShadow: '1px 1px 0 #000' }}
+                  >
+                    ✓
+                  </span>
+                ) : (
+                  <span className="hud-text text-stone-600 text-xs">🔒</span>
                 )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
 
-        {/* Experience */}
-        {portfolio.experience.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-text-muted mb-4" style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.45rem' }}>
-              EXPERIENCE
-            </h3>
-            <div className="space-y-4">
-              {portfolio.experience.map((exp, i) => (
-                <div key={i} className="border border-stone/20 p-4 bg-stone/5" style={{ borderRadius: '3px' }}>
-                  <div className="flex items-start justify-between mb-1">
-                    <h4 className="text-text-primary text-sm font-semibold">{exp.title}</h4>
-                    <span className="text-text-muted text-xs whitespace-nowrap ml-2">{exp.period}</span>
-                  </div>
-                  <p className="text-muted-cyan text-xs mb-2">{exp.company}</p>
-                  <p className="text-text-secondary text-xs leading-relaxed">{exp.description}</p>
-                  {exp.skills?.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {exp.skills.map(s => (
-                        <span key={s} className="px-1.5 py-0.5 text-xs border border-stone/20 text-text-muted" style={{ fontSize: '0.6rem' }}>
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Education */}
-        {portfolio.education.length > 0 && (
-          <div>
-            <h3 className="text-text-muted mb-4" style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '0.45rem' }}>
-              EDUCATION
-            </h3>
-            <div className="space-y-4">
-              {portfolio.education.map((edu, i) => (
-                <div key={i} className="border border-stone/20 p-4 bg-stone/5" style={{ borderRadius: '3px' }}>
-                  <h4 className="text-text-primary text-sm font-semibold">{edu.degree}</h4>
-                  <p className="text-muted-cyan text-xs mb-1">{edu.institution}</p>
-                  <p className="text-text-muted text-xs">{edu.period}</p>
-                  {edu.achievements?.length > 0 && (
-                    <ul className="mt-2 space-y-1">
-                      {edu.achievements.map((a, j) => (
-                        <li key={j} className="text-text-secondary text-xs flex items-start gap-1.5">
-                          <span className="text-muted-cyan">•</span> {a}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Bottom Button: Send a Message */}
+        <button
+          onClick={handleSendMessage}
+          className="btn-game w-full py-2.5 text-center"
+          style={{ fontSize: '0.62rem' }}
+        >
+          Send a Message
+        </button>
       </div>
     </div>
   );

@@ -1,133 +1,168 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import Particles from '../../components/Environment/Particles';
 
-/** Floating book that bobs gently */
-function FloatingBook({ position, color = '#1a1a6e', rotationSpeed = 0.3 }) {
-  const ref = useRef();
-  const offset = Math.random() * Math.PI * 2;
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.8 + offset) * 0.3;
-      ref.current.rotation.y += rotationSpeed * 0.01;
-    }
-  });
+/** Glowing Sea Lantern cube */
+function SeaLantern({ position = [0, 0, 0] }) {
   return (
-    <mesh ref={ref} position={position} castShadow>
-      <boxGeometry args={[0.6, 0.08, 0.4]} />
-      <meshStandardMaterial color={color} roughness={0.7} emissive={color} emissiveIntensity={0.15} />
-    </mesh>
+    <group position={position}>
+      {/* Chain */}
+      <mesh position={[0, 0.8, 0]}>
+        <cylinderGeometry args={[0.04, 0.04, 1.2, 6]} />
+        <meshStandardMaterial color="#333333" metalness={0.7} />
+      </mesh>
+      {/* Lantern Cube */}
+      <mesh castShadow>
+        <boxGeometry args={[1.0, 1.0, 1.0]} />
+        <meshStandardMaterial
+          color="#d5f5f5"
+          emissive="#7bedea"
+          emissiveIntensity={1.2}
+          roughness={0.3}
+        />
+      </mesh>
+      <pointLight color="#7bedea" intensity={1.8} distance={10} decay={2} />
+    </group>
   );
 }
 
-/** Area 03 — Enchantment Room: mystical skills area */
-export default function EnchantmentRoom() {
-  const tableRef = useRef();
-  
+/** Open Floating Enchanting Book */
+function EnchantingTableBook() {
+  const bookRef = useRef();
+
   useFrame((state) => {
-    if (tableRef.current) {
-      tableRef.current.rotation.y = state.clock.elapsedTime * 0.1;
+    if (bookRef.current) {
+      bookRef.current.position.y = 1.35 + Math.sin(state.clock.elapsedTime * 2.0) * 0.08;
+      bookRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.8) * 0.3;
     }
   });
 
   return (
+    <group ref={bookRef} position={[0, 1.35, 0]}>
+      {/* Left open page */}
+      <mesh position={[-0.24, 0, 0]} rotation={[0, 0, 0.35]}>
+        <boxGeometry args={[0.42, 0.04, 0.55]} />
+        <meshStandardMaterial color="#f0e6d2" roughness={0.8} />
+      </mesh>
+      {/* Right open page */}
+      <mesh position={[0.24, 0, 0]} rotation={[0, 0, -0.35]}>
+        <boxGeometry args={[0.42, 0.04, 0.55]} />
+        <meshStandardMaterial color="#f0e6d2" roughness={0.8} />
+      </mesh>
+      {/* Spine & Cover */}
+      <mesh position={[0, -0.05, 0]}>
+        <boxGeometry args={[0.12, 0.06, 0.56]} />
+        <meshStandardMaterial color="#8e44ad" roughness={0.7} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Area 03 — Enchantment Room: matches /reference/enchantment.png */
+export default function EnchantmentRoom() {
+  return (
     <group position={[80, 0, 0]}>
-      {/* Floor — dark obsidian */}
+      {/* Floor — Stone Brick Pattern */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#1a1a2e" roughness={0.95} />
+        <planeGeometry args={[22, 22]} />
+        <meshStandardMaterial color="#3a3a46" roughness={0.9} />
       </mesh>
 
-      {/* Walls */}
-      <mesh position={[0, 4, -10]} castShadow>
-        <boxGeometry args={[20, 8, 0.5]} />
-        <meshStandardMaterial color="#1a1a3e" roughness={0.95} />
+      {/* Back Wall */}
+      <mesh position={[0, 5, -9]} castShadow>
+        <boxGeometry args={[22, 10, 0.8]} />
+        <meshStandardMaterial color="#40404a" roughness={0.9} />
       </mesh>
-      <mesh position={[-10, 4, 0]} castShadow>
-        <boxGeometry args={[0.5, 8, 20]} />
-        <meshStandardMaterial color="#1a1a3e" roughness={0.95} />
+      {/* Left Wall */}
+      <mesh position={[-9, 5, 0]} castShadow>
+        <boxGeometry args={[0.8, 10, 22]} />
+        <meshStandardMaterial color="#40404a" roughness={0.9} />
       </mesh>
-      <mesh position={[10, 4, 0]} castShadow>
-        <boxGeometry args={[0.5, 8, 20]} />
-        <meshStandardMaterial color="#1a1a3e" roughness={0.95} />
+      {/* Right Wall */}
+      <mesh position={[9, 5, 0]} castShadow>
+        <boxGeometry args={[0.8, 10, 22]} />
+        <meshStandardMaterial color="#40404a" roughness={0.9} />
       </mesh>
-
       {/* Ceiling */}
-      <mesh position={[0, 8, 0]}>
-        <boxGeometry args={[20, 0.3, 20]} />
-        <meshStandardMaterial color="#0f0f2e" roughness={0.95} />
+      <mesh position={[0, 9, 0]}>
+        <boxGeometry args={[22, 0.4, 22]} />
+        <meshStandardMaterial color="#2d2d38" roughness={0.95} />
       </mesh>
 
-      {/* ── Enchanting Table ──────────────────────── */}
-      <group position={[0, 0, -3]}>
-        {/* Base */}
-        <mesh position={[0, 0.5, 0]} castShadow>
-          <boxGeometry args={[2, 1, 2]} />
-          <meshStandardMaterial color="#2d2d4e" roughness={0.8} />
+      {/* ── Central Obsidian Enchanting Table (Reference #4) ── */}
+      <group position={[0, 0, -1]}>
+        {/* Obsidian Base Block */}
+        <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
+          <boxGeometry args={[2.0, 1.0, 2.0]} />
+          <meshStandardMaterial color="#1a1528" roughness={0.8} />
         </mesh>
-        {/* Top surface */}
-        <mesh position={[0, 1.05, 0]} castShadow>
-          <boxGeometry args={[2.2, 0.1, 2.2]} />
-          <meshStandardMaterial color="#7b2fff" emissive="#7b2fff" emissiveIntensity={0.4} roughness={0.5} />
+
+        {/* 4 Diamond Corners on base */}
+        {[[-0.85, -0.85], [0.85, -0.85], [-0.85, 0.85], [0.85, 0.85]].map(([x, z], i) => (
+          <mesh key={i} position={[x, 0.7, z]} castShadow>
+            <boxGeometry args={[0.42, 0.42, 0.42]} />
+            <meshStandardMaterial
+              color="#00e5ff"
+              emissive="#0088aa"
+              emissiveIntensity={0.6}
+              roughness={0.3}
+            />
+          </mesh>
+        ))}
+
+        {/* Red Cloth Top */}
+        <mesh position={[0, 1.02, 0]} castShadow>
+          <boxGeometry args={[1.7, 0.06, 1.7]} />
+          <meshStandardMaterial color="#c0392b" roughness={0.85} />
         </mesh>
-        {/* Floating diamond above table */}
-        <mesh ref={tableRef} position={[0, 2.5, 0]} castShadow>
-          <octahedronGeometry args={[0.3]} />
-          <meshStandardMaterial color="#00d4ff" emissive="#00d4ff" emissiveIntensity={1} transparent opacity={0.8} />
+
+        {/* Floating Animated Open Book */}
+        <EnchantingTableBook />
+
+        {/* Purple Magic Light Beam shooting upward */}
+        <mesh position={[0, 4.5, 0]}>
+          <cylinderGeometry args={[0.5, 0.8, 7, 16]} />
+          <meshBasicMaterial
+            color="#a855f7"
+            transparent
+            opacity={0.25}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
         </mesh>
-        {/* Light source */}
-        <pointLight position={[0, 2.5, 0]} color="#7b2fff" intensity={3} distance={12} decay={2} />
+        <pointLight position={[0, 2.0, 0]} color="#a855f7" intensity={3.5} distance={12} decay={2} />
       </group>
 
-      {/* ── Bookshelves along walls ───────────────── */}
-      {[-7, -5, -3, 3, 5, 7].map((x) => (
-        <group key={`eshelf-${x}`} position={[x, 0, -9.5]}>
-          <mesh position={[0, 2, 0]} castShadow>
-            <boxGeometry args={[1.8, 4, 0.8]} />
-            <meshStandardMaterial color="#2d1b3e" roughness={0.9} />
+      {/* ── Wall Bookshelves (Bookshelf Library) ─────── */}
+      {[-6, -4, -2, 2, 4, 6].map((x) => (
+        <group key={`shelf-${x}`} position={[x, 0, -8.3]}>
+          <mesh position={[0, 1.8, 0]} castShadow>
+            <boxGeometry args={[1.9, 3.6, 0.7]} />
+            <meshStandardMaterial color="#5C3A1E" roughness={0.9} />
           </mesh>
-          {[0.7, 1.5, 2.3, 3.1].map((y, j) => (
+          {/* Books in shelves */}
+          {[0.6, 1.4, 2.2, 3.0].map((y, j) => (
             <mesh key={j} position={[0, y, 0.1]}>
-              <boxGeometry args={[1.5, 0.5, 0.6]} />
-              <meshStandardMaterial 
-                color={['#3a1a5e', '#1a3a5e', '#2a1a4e', '#1a2a4e'][j % 4]} 
-                roughness={0.85} 
+              <boxGeometry args={[1.7, 0.5, 0.5]} />
+              <meshStandardMaterial
+                color={['#8e44ad', '#2980b9', '#27ae60', '#c0392b'][j % 4]}
+                roughness={0.8}
               />
             </mesh>
           ))}
         </group>
       ))}
 
-      {/* ── Rune pillars ──────────────────────────── */}
-      {[[-4, -6], [4, -6], [-4, 2], [4, 2]].map(([x, z], i) => (
-        <group key={`pillar-${i}`} position={[x, 0, z]}>
-          <mesh position={[0, 2, 0]} castShadow>
-            <boxGeometry args={[0.8, 4, 0.8]} />
-            <meshStandardMaterial color="#2d2d4e" roughness={0.9} />
-          </mesh>
-          {/* Glowing rune */}
-          <mesh position={[0, 2.5, 0.42]}>
-            <boxGeometry args={[0.3, 0.3, 0.02]} />
-            <meshStandardMaterial color="#7b2fff" emissive="#7b2fff" emissiveIntensity={1.5} />
-          </mesh>
-          <pointLight position={[0, 2.5, 0.5]} color="#7b2fff" intensity={0.5} distance={4} decay={2} />
-        </group>
-      ))}
+      {/* ── Hanging Sea Lanterns ────────────────────── */}
+      <SeaLantern position={[-4, 7, -4]} />
+      <SeaLantern position={[4, 7, -4]} />
+      <SeaLantern position={[-4, 7, 3]} />
+      <SeaLantern position={[4, 7, 3]} />
 
-      {/* ── Floating Books ────────────────────────── */}
-      <FloatingBook position={[-2, 3, -4]} color="#3a1a5e" />
-      <FloatingBook position={[2.5, 3.5, -2]} color="#1a3a5e" rotationSpeed={0.5} />
-      <FloatingBook position={[-1, 4, -1]} color="#4a1a6e" rotationSpeed={0.2} />
-      <FloatingBook position={[1.5, 3.2, -5]} color="#2a2a6e" rotationSpeed={0.4} />
-
-      {/* ── Ambient lighting ──────────────────────── */}
-      <pointLight position={[0, 6, 0]} color="#4a00b0" intensity={1} distance={15} decay={2} />
-      <pointLight position={[-6, 2, -6]} color="#00d4ff" intensity={0.5} distance={8} decay={2} />
-      <pointLight position={[6, 2, -6]} color="#00d4ff" intensity={0.5} distance={8} decay={2} />
-
-      {/* ── Purple Particles ──────────────────────── */}
-      <Particles count={30} area={12} color="#7b2fff" speed={0.15} />
-      <Particles count={15} area={8} color="#00d4ff" speed={0.1} />
+      {/* ── Floating Rune Particles ─────────────────── */}
+      <Particles count={40} area={12} color="#c084fc" speed={0.15} />
+      <Particles count={25} area={8} color="#00e5ff" speed={0.1} />
     </group>
   );
 }

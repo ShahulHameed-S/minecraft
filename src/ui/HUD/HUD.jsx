@@ -10,7 +10,7 @@ import portfolio from '../../data/portfolio';
  * - Bottom-left: subtle build watermark
  */
 export default function HUD() {
-  const { currentArea, phase } = useGame();
+  const { currentArea, phase, activePanel, activeModal, setPanel } = useGame();
 
   if (phase !== 'playing' && phase !== 'menu') return null;
 
@@ -167,8 +167,65 @@ export default function HUD() {
             1-9 &mdash; Hotbar
           </p>
           <p className="hud-text" style={{ fontSize: '0.42rem', color: '#aaaaaa', textShadow: '1px 1px 0 #000' }}>
+            [E] &mdash; Interact
+          </p>
+          <p className="hud-text" style={{ fontSize: '0.42rem', color: '#aaaaaa', textShadow: '1px 1px 0 #000' }}>
             ESC &mdash; Menu
           </p>
+        </div>
+      )}
+
+      {/* ── [E] Interactive Action Prompt ────────────────────────── */}
+      {phase === 'playing' && !activePanel && !activeModal && (
+        <div className="absolute bottom-[114px] left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
+          <button
+            onClick={() => {
+              const panelMap = {
+                spawn: 'about',
+                workshop: 'about',
+                enchantment: 'skills',
+                trading: 'projects',
+                advancements: 'experience',
+                theEnd: 'contact',
+              };
+              setPanel(panelMap[currentArea] || 'about');
+            }}
+            className="flex items-center gap-2 px-3.5 py-1.5 cursor-pointer select-none transition-transform hover:scale-105 active:scale-95"
+            style={{
+              background: 'rgba(20, 16, 28, 0.92)',
+              border: '2px solid #5a5a7a',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.65), inset 1px 1px 0 rgba(255,255,255,0.15)',
+            }}
+            aria-label="Interact"
+          >
+            <span
+              className="hud-text px-1.5 py-0.5 rounded text-[10px]"
+              style={{
+                background: '#ffd700',
+                color: '#1a1000',
+                fontWeight: 'bold',
+                boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.4)',
+              }}
+            >
+              E
+            </span>
+            <span
+              className="hud-text text-[10px] text-[#f0e6d2]"
+              style={{ textShadow: '1px 1px 0 #000' }}
+            >
+              {currentArea === 'workshop'
+                ? 'Open Player Profile'
+                : currentArea === 'enchantment'
+                ? 'Open Enchanting Table'
+                : currentArea === 'trading'
+                ? 'Trade / Open Chest'
+                : currentArea === 'advancements'
+                ? 'View Advancements Tree'
+                : currentArea === 'theEnd'
+                ? 'Enter Portal / Contact'
+                : 'Interact / View Profile'}
+            </span>
+          </button>
         </div>
       )}
     </div>

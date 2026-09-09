@@ -78,14 +78,20 @@ export default function Player() {
       targetPosition.current.set(2.6, 0, 3.8);
       return;
     }
-    // Only teleport if in playing phase and area is valid
+    // Teleport to target area coordinates in playing phase
     if (phase === 'playing') {
       const areaObj = Object.values(AREAS).find((a) => a.id === currentArea);
-      if (areaObj && currentArea === 'spawn') {
-        targetPosition.current.set(0, 0, 2);
+      if (areaObj) {
+        if (currentArea === 'spawn') {
+          targetPosition.current.set(0, 0, 2);
+          camera.position.set(0, 4.5, 7.5);
+        } else {
+          targetPosition.current.set(areaObj.position[0], areaObj.position[1], areaObj.position[2] + 4);
+          camera.position.set(areaObj.position[0], areaObj.position[1] + 4.5, areaObj.position[2] + 11);
+        }
       }
     }
-  }, [currentArea, phase]);
+  }, [currentArea, phase, camera]);
 
   // Keyboard controls (playing only)
   useEffect(() => {

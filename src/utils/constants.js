@@ -54,12 +54,12 @@ export const COLORS = {
 
 // ─── Area Definitions ─────────────────────────────────
 export const AREAS = {
-  SPAWN:        { id: 'spawn',       name: 'Spawn Village',     biome: 'Plains',           position: [0, 0, 0],     color: COLORS.forestGreen },
-  WORKSHOP:     { id: 'workshop',    name: "Builder's Workshop", biome: 'Workshop Interior', position: [40, 0, 0],    color: COLORS.warmBrown },
-  ENCHANTMENT:  { id: 'enchantment', name: 'Enchantment Room',  biome: 'Mystic Chamber',   position: [80, 0, 0],    color: COLORS.magicPurple },
-  TRADING:      { id: 'trading',     name: 'Trading Hall',      biome: 'Market District',  position: [120, 0, 0],   color: COLORS.lanternGold },
-  ADVANCEMENTS: { id: 'advancements',name: 'Advancements',      biome: 'Hall of Records',  position: [160, 0, 0],   color: COLORS.mutedCyan },
-  THE_END:      { id: 'theEnd',      name: 'The End',           biome: 'The Void',         position: [200, 0, 0],   color: COLORS.magicBlue },
+  SPAWN:        { id: 'spawn',       name: 'Spawn Village',     biome: 'Plains',        position: [0, 0, 0],     color: COLORS.forestGreen },
+  WORKSHOP:     { id: 'workshop',    name: 'Player Profile',    biome: 'Cherry Grove',  position: [40, 0, 0],    color: COLORS.warmBrown },
+  ENCHANTMENT:  { id: 'enchantment', name: 'Enchantment Room',  biome: 'Stronghold',    position: [80, 0, 0],    color: COLORS.magicPurple },
+  TRADING:      { id: 'trading',     name: 'Trading Hall',      biome: 'Mineshaft',     position: [120, 0, 0],   color: COLORS.lanternGold },
+  ADVANCEMENTS: { id: 'advancements',name: 'Advancements',      biome: 'Deep Dark',     position: [160, 0, 0],   color: COLORS.mutedCyan },
+  THE_END:      { id: 'theEnd',      name: 'The End',           biome: 'The Void',      position: [200, 0, 0],   color: COLORS.magicBlue },
 };
 
 // ─── Quality Presets ──────────────────────────────────
